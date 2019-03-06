@@ -17,7 +17,7 @@ def main():
 
 	curr_time=rospy.get_time()
 	while(True):
-		if rospy.get_time()-curr_time >= 1:
+		if rospy.get_time()-curr_time >= 10:
 			goal = manip_prelim.msg.MoveGripperGoal()
 			print "requesting"
 			client.send_goal(goal)
