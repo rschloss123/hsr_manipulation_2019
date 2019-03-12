@@ -34,6 +34,7 @@ add_action_files(
   DIRECTORY action
   FILES
    MoveGripper.action
+   pickUp.action
 )
 
 generate_messages(

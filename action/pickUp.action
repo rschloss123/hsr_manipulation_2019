@@ -1,4 +1,5 @@
 #goal definition
+geometry_msgs/PoseStamped target_pose
 ---
 #result definition
 ---
