@@ -12,6 +12,7 @@ import rospy
 
 
 _ORIGIN_TF = 'base_link' # TODO
+_ORIGIN_TF = 'head_rgbd_sensor_link'
 
 def main():
 	client = actionlib.SimpleActionClient('pickUpaction', manip_prelim.msg.pickUpAction)
@@ -22,15 +23,27 @@ def main():
 
 	goal = manip_prelim.msg.pickUpGoal()
 
-	goal.target_pose.pose.position.x=0.5
-	goal.target_pose.pose.position.y=0.0
-	goal.target_pose.pose.position.z=0.0
+	# base frame
+	# goal.target_pose.pose.position.x=0.5
+	# goal.target_pose.pose.position.y=0.0
+	# goal.target_pose.pose.position.z=0.4
+	# goal.target_pose.pose.orientation.x=0.0
+	# goal.target_pose.pose.orientation.y=0.0
+	# goal.target_pose.pose.orientation.z=0.0
+	# goal.target_pose.pose.orientation.w=0.0
+	# goal.target_pose.header.frame_id=_ORIGIN_TF
+	
+	# rgbd
+	goal.target_pose.pose.position.x=0.0
+	goal.target_pose.pose.position.y=0.5
+	goal.target_pose.pose.position.z=0.4
 	goal.target_pose.pose.orientation.x=0.0
 	goal.target_pose.pose.orientation.y=0.0
 	goal.target_pose.pose.orientation.z=0.0
 	goal.target_pose.pose.orientation.w=0.0
 	goal.target_pose.header.frame_id=_ORIGIN_TF
-	
+
+
 	print "requesting"
 	client.send_goal(goal)
 	#rospy.Duration(5.0)

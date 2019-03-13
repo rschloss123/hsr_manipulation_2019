@@ -13,11 +13,17 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from manip_prelim.msg import *
 import math
 
+import numpy as np 
 from numpy import linalg as LA
+from numpy.linalg import inv
 
-_ORIGIN_TF = 'base_link' # TODO
+
 _BASE_TF = 'base_link'
 _MAP_TF = 'map'
+_HEAD_TF = 'head_rgbd_sensor_link'
+_ARM_LIFT_TF = 'arm_lift_link'
+_ORIGIN_TF = _HEAD_TF # TODO
+ARM_LENGTH = 0.35; # distance from shoulder joint to wrist joints. measured on the robot
 
 class GraspAction(object):
 
@@ -41,17 +47,44 @@ class GraspAction(object):
 		self.target_backup.header.frame_id=_ORIGIN_TF
 
 
-		listener=tf.TransformListener()
-		listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		self.listener=tf.TransformListener()
+		# transform from base frame to map frame
+		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+
+		# ---------------------------------------------------------------------
+
+		# t = self.listener.getLatestCommonTime(_BASE_TF, _MAP_TF)
+		# position, quaternion = self.listener.lookupTransform(_BASE_TF, _MAP_TF, t)
+		# print "map wrt to base"
+		# print "position", position
+		# print " "
+		# print "quaternion", quaternion
+		# print " "
+
+		# e = tf.transformations.euler_from_quaternion(quaternion)
+		# R_map_wrt_base = tf.transformations.euler_matrix(e[0], e[1], e[2], 'rxyz')
+		# self.R_map_wrt_base = R_map_wrt_base[:3,:3]
+
+		# print "self.R_map_wrt_base"
+		# print self.R_map_wrt_base 
 
 
-		t = listener.getLatestCommonTime(_BASE_TF, _MAP_TF)
-		position, quaternion = listener.lookupTransform(_BASE_TF, _MAP_TF, t)
-		print "position", position
-		print " "
-		print "quaternion", quaternion
+		# exit()
 
-		self.target_backup_map = listener.transformPose(_MAP_TF,self.target_backup)
+		# # t2 = listener.getLatestCommonTime(_HEAD_TF, _MAP_TF)
+		# # position, quaternion = listener.lookupTransform(_HEAD_TF, _MAP_TF, t2)
+		# # print "map wrt to head"
+		# # print "position", position
+		# # print " "
+		# # print "quaternion", quaternion
+		
+
+		# exit()
+		# ----------------------------------------------------------------------
+
+
+		# target position to back up to in the map frame 
+		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
 
 		self.error_threshold = 0.01
 
@@ -104,6 +137,8 @@ class GraspAction(object):
 			print "error_y", error_y 
 			print "target_x", target_x
 			print "curr_x",curr_x
+			print "target_y", target_y
+			print "curr_y",curr_y
 			self.print_count = 0 
 		else: 
 			self.print_count+=1 
@@ -111,26 +146,69 @@ class GraspAction(object):
 		return error_x, error_y  
 
 
-	def track_motion(self, target, backup=False):
+	def get_vel_command(self, error, prev_error, step_one, sign): 
+
+		fast_v = .1
+		slow_v = .05
+
+
+		if error > prev_error and step_one == False:
+			sign = -sign
+
+		if error > self.error_threshold:
+			if error > self.error_threshold+.01:
+				v = fast_v
+			else:
+				v = slow_v
+		else:
+			v = 0.0
+
+		vel_command = sign * v
+
+		return vel_command 		
+
+
+	def track_motion(self, target_map, backup=False):
 		sign_x = 1.0
 		sign_y = 1.0
 
 		if backup == True :
 			sign_x = -sign_x
 
-		error_x, error_y  = self.compute_error(target)
+
+		step_one = True 
+		error_x, error_y  = self.compute_error(target_map)
+		original_error_x = error_x 
+		original_error_y = error_y 
+		prev_error_x = error_x 
+		prev_error_y = error_y 
+		
 
 		while(error_x > self.error_threshold): # or error_y > self.error_threshold:  
 			# TODO consider direction of errors
 			# TODO consider twist errors?  
 			tw = geometry_msgs.msg.Twist()
 
-			# Todo: map link and base link are in opposite directions. Need to access the transform
 			# if target.pose.position.y > self.robot_pos.position.y: 
 			# 	sign_y = -sign_y  
 
-			if error_x > self.error_threshold:
-				tw.linear.x = sign_x * 0.05 
+			# if error_x > prev_error_x and step_one == False:
+			# 	sign_x = -sign_x 
+
+			# if error_x > self.error_threshold:
+			# 	if error_x > self.error_threshold+.01:
+			# 		v = fast_v
+			# 	else:
+			# 		v = slow_v
+
+			# tw.linear.x = sign_x * v
+			if original_error_x > .2:
+				tw.linear.x = self.get_vel_command(error_x, prev_error_x, step_one, sign_x)
+			if original_error_y > .2: 
+				tw.linear.y = self.get_vel_command(error_y, prev_error_y, step_one, sign_y)
+
+			prev_error_x = error_x 
+			prev_error_y = error_y 			
 
 			if self.print_count == 10000:
 				print "tw.linear.x", tw.linear.x
@@ -142,7 +220,8 @@ class GraspAction(object):
 
 			self.vel_pub.publish(tw)
 
-			error_x, error_y = self.compute_error(target)
+			error_x, error_y = self.compute_error(target_map)
+			step_one = True 
 
 		return 		
 
@@ -151,9 +230,16 @@ class GraspAction(object):
 
 		self.target_pose=goal.target_pose
 
-		listener=tf.TransformListener()
-		listener.waitForTransform(_ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
-		target_pose_map = listener.transformPose(_MAP_TF,self.target_pose)
+		self.listener.waitForTransform(_ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		target_pose_map = self.listener.transformPose(_MAP_TF,self.target_pose)
+		self.listener.waitForTransform(_ORIGIN_TF,_ARM_LIFT_TF,rospy.Time(),rospy.Duration(2.0))
+		target_pose_arm_lift = self.listener.transformPose(_ARM_LIFT_TF,self.target_pose)
+
+		print "target_pose_map"
+		print target_pose_map
+		exit()
+		# self.listener.waitForTransform(_ORIGIN_TF,_BASE_TF,rospy.Time(),rospy.Duration(2.0))
+		# self.target_pose_base = listener.transformPose(_BASE_TF,self.target_pose)
 
 		# make sure gripper is open
 		self.open_gripper()
@@ -163,9 +249,13 @@ class GraspAction(object):
 
 		# calculate transform for arm
 		# TODO : add arm height to action and do transformation
-		obj_arm_lift_link = 0.2
+		# obj_arm_lift_link = 0.2
+		obj_arm_lift_link = target_pose_arm_lift.pose.position.z
+		obj_arm_flex_joint = -1.57
 		
-		self.body.move_to_joint_positions({'arm_flex_joint': -1.57, 'wrist_flex_joint': 0.0, 'arm_lift_joint':obj_arm_lift_link})
+		self.body.move_to_joint_positions({'arm_flex_joint': obj_arm_flex_joint, 'wrist_flex_joint': 0.0, 'arm_lift_joint':obj_arm_lift_link})
+
+		print "obj_arm_lift_link",obj_arm_lift_link
 
 		self.track_motion(target_pose_map,backup=False)
 		rospy.sleep(2.0)
@@ -177,6 +267,10 @@ class GraspAction(object):
 		self.track_motion(self.target_backup_map,backup=True)
 
 		rospy.loginfo("back up complete")
+
+		self.body.move_to_neutral()
+
+		rospy.loginfo("close gripper")
 		
 
 		self._as.set_succeeded()
