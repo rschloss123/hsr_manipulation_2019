@@ -22,7 +22,7 @@ _BASE_TF = 'base_link'
 _MAP_TF = 'map'
 _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
-_ORIGIN_TF = _HEAD_TF # TODO
+_ORIGIN_TF = 'head_rgbd_sensor_link' 
 ARM_LENGTH = 0.35; # distance from shoulder joint to wrist joints. measured on the robot
 
 class GraspAction(object):
@@ -44,32 +44,34 @@ class GraspAction(object):
 		self.target_backup.pose.orientation.y=0.0
 		self.target_backup.pose.orientation.z=0.0
 		self.target_backup.pose.orientation.w=0.0
-		self.target_backup.header.frame_id=_ORIGIN_TF
+		self.target_backup.header.frame_id=_BASE_TF
 
 
 		self.listener=tf.TransformListener()
-		# transform from base frame to map frame
+		# # transform from base frame to map frame
 		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 
 		# ---------------------------------------------------------------------
 
-		# t = self.listener.getLatestCommonTime(_BASE_TF, _MAP_TF)
-		# position, quaternion = self.listener.lookupTransform(_BASE_TF, _MAP_TF, t)
-		# print "map wrt to base"
-		# print "position", position
-		# print " "
-		# print "quaternion", quaternion
-		# print " "
+		t = self.listener.getLatestCommonTime(_BASE_TF, _MAP_TF)
+		position, quaternion = self.listener.lookupTransform(_BASE_TF, _MAP_TF, t)
+		print "map wrt to base"
+		print "position", position
+		print " "
+		print "quaternion", quaternion
+		print " "
 
-		# e = tf.transformations.euler_from_quaternion(quaternion)
-		# R_map_wrt_base = tf.transformations.euler_matrix(e[0], e[1], e[2], 'rxyz')
-		# self.R_map_wrt_base = R_map_wrt_base[:3,:3]
+		e = tf.transformations.euler_from_quaternion(quaternion)
+		R_map_wrt_base = tf.transformations.euler_matrix(e[0], e[1], e[2], 'rxyz')
+		self.R_map_wrt_base = R_map_wrt_base[:3,:3]
 
-		# print "self.R_map_wrt_base"
-		# print self.R_map_wrt_base 
+		print "self.R_map_wrt_base"
+		print self.R_map_wrt_base 
 
-
-		# exit()
+		self.x_align = True if np.abs(self.R_map_wrt_base[0,0]) >= np.abs(self.R_map_wrt_base[1,0]) else False  
+		print np.abs(self.R_map_wrt_base[0,0])
+		print np.abs(self.R_map_wrt_base[1,0]) 
+		print self.x_align 
 
 		# # t2 = listener.getLatestCommonTime(_HEAD_TF, _MAP_TF)
 		# # position, quaternion = listener.lookupTransform(_HEAD_TF, _MAP_TF, t2)
@@ -83,9 +85,6 @@ class GraspAction(object):
 		# ----------------------------------------------------------------------
 
 
-		# target position to back up to in the map frame 
-		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
-
 		self.error_threshold = 0.01
 
 		self.vel_pub = rospy.Publisher('/hsrb/command_velocity', geometry_msgs.msg.Twist, queue_size=10)
@@ -97,7 +96,7 @@ class GraspAction(object):
 			try:
 				self.body=self.robot.try_get('whole_body')
 				self.gripper = self.robot.try_get('gripper')
-				self.base=self.robot.try_get('omni_base')
+				# self.base=self.robot.try_get('omni_base')
 				self.open_gripper()
 				self.body.move_to_neutral()
 				break 
@@ -139,6 +138,7 @@ class GraspAction(object):
 			print "curr_x",curr_x
 			print "target_y", target_y
 			print "curr_y",curr_y
+			print ""
 			self.print_count = 0 
 		else: 
 			self.print_count+=1 
@@ -151,7 +151,6 @@ class GraspAction(object):
 		fast_v = .1
 		slow_v = .05
 
-
 		if error > prev_error and step_one == False:
 			sign = -sign
 
@@ -160,8 +159,8 @@ class GraspAction(object):
 				v = fast_v
 			else:
 				v = slow_v
-		else:
-			v = 0.0
+		# else:
+			# v = 0.0
 
 		vel_command = sign * v
 
@@ -174,6 +173,8 @@ class GraspAction(object):
 
 		if backup == True :
 			sign_x = -sign_x
+		if backup == True :
+			sign_y = -sign_y
 
 
 		step_one = True 
@@ -182,43 +183,40 @@ class GraspAction(object):
 		original_error_y = error_y 
 		prev_error_x = error_x 
 		prev_error_y = error_y 
+
+		print "original error x, y", original_error_x, original_error_y
 		
 
-		while(error_x > self.error_threshold): # or error_y > self.error_threshold:  
+		while(error_x > self.error_threshold or error_y > self.error_threshold): # or error_y > self.error_threshold:  
 			# TODO consider direction of errors
 			# TODO consider twist errors?  
 			tw = geometry_msgs.msg.Twist()
-
-			# if target.pose.position.y > self.robot_pos.position.y: 
-			# 	sign_y = -sign_y  
-
-			# if error_x > prev_error_x and step_one == False:
-			# 	sign_x = -sign_x 
-
-			# if error_x > self.error_threshold:
-			# 	if error_x > self.error_threshold+.01:
-			# 		v = fast_v
-			# 	else:
-			# 		v = slow_v
+			tw.linear.x = 0
+			tw.linear.y = 0
 
 			# tw.linear.x = sign_x * v
-			if original_error_x > .2:
-				tw.linear.x = self.get_vel_command(error_x, prev_error_x, step_one, sign_x)
-			if original_error_y > .2: 
-				tw.linear.y = self.get_vel_command(error_y, prev_error_y, step_one, sign_y)
+			if error_x > self.error_threshold:
+				if self.x_align == True: 
+					tw.linear.x = self.get_vel_command(error_x, prev_error_x, step_one, sign_x)
+				else: 
+					tw.linear.y = self.get_vel_command(error_x, prev_error_x, step_one, sign_x)
+			if error_y > self.error_threshold:
+				if self.x_align == True: 
+					tw.linear.y = self.get_vel_command(error_y, prev_error_y, step_one, sign_y)
+				else: 
+					tw.linear.x = self.get_vel_command(error_y, prev_error_y, step_one, sign_y)
 
 			prev_error_x = error_x 
 			prev_error_y = error_y 			
 
-			if self.print_count == 10000:
-				print "tw.linear.x", tw.linear.x
-
-
-			# TODO
-			# if error_y > self.error_threshold:
-			# 	tw.linear.y = sign_y * 0.1
-
+			# the velocity 
 			self.vel_pub.publish(tw)
+
+			if self.print_count == 10000: 
+				print "tw.linear.x", tw.linear.x
+				print "tw.linear.y", tw.linear.y 
+
+
 
 			error_x, error_y = self.compute_error(target_map)
 			step_one = True 
@@ -234,10 +232,11 @@ class GraspAction(object):
 		target_pose_map = self.listener.transformPose(_MAP_TF,self.target_pose)
 		self.listener.waitForTransform(_ORIGIN_TF,_ARM_LIFT_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_arm_lift = self.listener.transformPose(_ARM_LIFT_TF,self.target_pose)
+		# transform from base frame to map frame
 
 		print "target_pose_map"
 		print target_pose_map
-		exit()
+		
 		# self.listener.waitForTransform(_ORIGIN_TF,_BASE_TF,rospy.Time(),rospy.Duration(2.0))
 		# self.target_pose_base = listener.transformPose(_BASE_TF,self.target_pose)
 
@@ -258,11 +257,17 @@ class GraspAction(object):
 		print "obj_arm_lift_link",obj_arm_lift_link
 
 		self.track_motion(target_pose_map,backup=False)
+
+		print "forward motion complete"
+		
 		rospy.sleep(2.0)
 		self.close_gripper()
 		self.gripper_state=False
 		rospy.loginfo("close_gripper")
 
+		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		# target position to back up to in the map frame 
+		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
 
 		self.track_motion(self.target_backup_map,backup=True)
 
