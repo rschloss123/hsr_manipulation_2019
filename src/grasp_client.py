@@ -35,8 +35,8 @@ def main():
 	
 	# rgbd
 	goal.target_pose.pose.position.x=0.0
-	goal.target_pose.pose.position.y=0.5
-	goal.target_pose.pose.position.z=0.4
+	goal.target_pose.pose.position.y=.4 #.3 #0.5
+	goal.target_pose.pose.position.z=.6 #1 #.4
 	goal.target_pose.pose.orientation.x=0.0
 	goal.target_pose.pose.orientation.y=0.0
 	goal.target_pose.pose.orientation.z=0.0

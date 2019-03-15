@@ -8,7 +8,7 @@ from std_msgs.msg import *
 from geometry_msgs.msg import *
 from hsrb_interface import Robot, exceptions, geometry
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-
+from sensor_msgs.msg import JointState
 
 from manip_prelim.msg import *
 import math
@@ -24,6 +24,14 @@ _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
 _ORIGIN_TF = 'head_rgbd_sensor_link' 
 ARM_LENGTH = 0.35; # distance from shoulder joint to wrist joints. measured on the robot
+MAX_ARM_LIFT=0.69 #joint limit of arm lift joint 
+OBJECT_LIFT_OFFSET = 0.04
+MAX_V = 0.2
+MIN_V = 0.05
+ERROR_THRESHOLD = 0.01
+SLOW_V_CUTOFF = ERROR_THRESHOLD + .01
+V_SLOPE_ERROR = (MAX_V-MIN_V)/(1-SLOW_V_CUTOFF)
+V_B_ERROR = MIN_V-V_SLOPE_ERROR * SLOW_V_CUTOFF
 
 class GraspAction(object):
 
@@ -39,7 +47,7 @@ class GraspAction(object):
 
 		# in the base link frame
 		self.target_backup=PoseStamped()
-		self.target_backup.pose.position.x=-0.1
+		self.target_backup.pose.position.x=-0.2
 		self.target_backup.pose.position.y=0.0
 		self.target_backup.pose.position.z=0.0
 		self.target_backup.pose.orientation.x=0.0
@@ -87,12 +95,14 @@ class GraspAction(object):
 		# ----------------------------------------------------------------------
 
 
-		self.error_threshold = 0.01
+		
 
 		self.vel_pub = rospy.Publisher('/hsrb/command_velocity', geometry_msgs.msg.Twist, queue_size=10)
 
 		global_pose_topic = 'global_pose'
-		self.global_pose_sub = rospy.Subscriber(global_pose_topic, PoseStamped, self.pose_callback)
+		rospy.Subscriber(global_pose_topic, PoseStamped, self.pose_callback)
+		joint_states_topic = 'hsrb/joint_states'
+		rospy.Subscriber(joint_states_topic, JointState, self.joint_state_Cb)
 
 		while not rospy.is_shutdown():
 			try:
@@ -158,19 +168,11 @@ class GraspAction(object):
 
 	def get_vel_command(self, error_norm, prev_error, error, step_one, sign): 
 
-		fast_v = .1
-		slow_v = .05
+		if error_norm > SLOW_V_CUTOFF:
+			v = min(MAX_V, V_SLOPE_ERROR*error_norm+V_B_ERROR)
+		else:
+			v = MIN_V
 
-		if error_norm > prev_error and step_one == False:
-			sign = -sign
-
-		if error_norm > self.error_threshold:
-			if error_norm > self.error_threshold+.01:
-				v = fast_v
-			else:
-				v = slow_v
-		# else:
-			# v = 0.0
 
 		vel_command = np.sign(error) * v
 
@@ -197,7 +199,7 @@ class GraspAction(object):
 		print "original error x, y", original_error_x, original_error_y
 		
 
-		while(error_x_norm > self.error_threshold or error_y_norm > self.error_threshold): 
+		while(error_x_norm > ERROR_THRESHOLD or error_y_norm > ERROR_THRESHOLD): 
 			# TODO consider direction of errors
 			# TODO consider twist errors?  
 			tw = geometry_msgs.msg.Twist()
@@ -205,9 +207,9 @@ class GraspAction(object):
 			tw.linear.y = 0
 
 			# tw.linear.x = sign_x * v
-			if error_x_norm > self.error_threshold:
+			if error_x_norm > ERROR_THRESHOLD:
 				tw.linear.x = self.get_vel_command(error_x_norm, prev_error_x, error_x, step_one, sign_x)
-			if error_y > self.error_threshold:
+			if error_y_norm > ERROR_THRESHOLD:
 				tw.linear.y = self.get_vel_command(error_y_norm, prev_error_y, error_y, step_one, sign_y)
 
 			prev_error_x = error_x_norm 
@@ -253,9 +255,6 @@ class GraspAction(object):
 		self.gripper_state=True
 		rospy.loginfo("open_gripper")
 
-		# calculate transform for arm
-		# TODO : add arm height to action and do transformation
-		# obj_arm_lift_link = 0.2
 		obj_arm_lift_link = target_pose_arm_lift.pose.position.z
 		obj_arm_flex_joint = -1.57
 		
@@ -271,6 +270,11 @@ class GraspAction(object):
 		self.close_gripper()
 		self.gripper_state=False
 		rospy.loginfo("close_gripper")
+
+		arm_obj_lift_val = min(self.cur_arm_lift+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
+
+		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
+
 
 		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 		# # target position to back up to in the map frame 
@@ -292,6 +296,13 @@ class GraspAction(object):
 	def setDown():
 
 		self.open_gripper()
+
+	def joint_state_Cb(self, msg):
+		self.cur_arm_flex=msg.position[0]
+		self.cur_arm_lift=msg.position[1]
+		self.cur_arm_roll=msg.position[2]
+		self.cur_wrist_roll=msg.position[12]
+		self.cur_wrist_flex=msg.position[11]
 
 	def pose_callback(self,msg):
 		self.robot_pos.pose=msg.pose 
