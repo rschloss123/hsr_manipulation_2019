@@ -11,17 +11,17 @@ from manip_prelim.msg import *
 import rospy
 
 
-_ORIGIN_TF = 'base_link' # TODO
+# _ORIGIN_TF = 'base_link' # TODO
 _ORIGIN_TF = 'head_rgbd_sensor_link'
 
 def main():
-	client = actionlib.SimpleActionClient('pickUpaction', manip_prelim.msg.pickUpAction)
+	client = actionlib.SimpleActionClient('putDownaction', manip_prelim.msg.pickUpAction)
 
 	client.wait_for_server()
 
 	curr_time=rospy.get_time()
 
-	goal = manip_prelim.msg.pickUpGoal()
+	goal = manip_prelim.msg.putDownGoal()
 
 	# base frame
 	# goal.target_pose.pose.position.x=0.5

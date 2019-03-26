@@ -119,7 +119,11 @@ class GraspAction(object):
 		self.navi_cli = actionlib.SimpleActionClient('/move_base/move', MoveBaseAction)
 
 		self._as = actionlib.SimpleActionServer('pickUpaction', manip_prelim.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
+		
+		self._putdown_as = actionlib.SimpleActionServer('putDownaction', manip_prelim.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
+
 		self._as.start()
+		self._putdown_as.start()
 
 	def compute_error(self, target_map):
 
@@ -219,11 +223,10 @@ class GraspAction(object):
 
 			error_x_norm, error_y_norm, error_x, error_y = self.compute_error(target_map)
 
-		return 		
+		return 	
 
-	# TODO: figure out assumptions. Will the robot be directly in front of the object?
-	def pickUp(self, goal):
-
+	def get_target_pose(self, goal):
+			
 		self.target_pose=goal.target_pose
 
 		# account for length of arm fully extended
@@ -236,6 +239,26 @@ class GraspAction(object):
 
 		print "target_pose_map"
 		print target_pose_map
+
+		return (target_pose_map, target_pose_arm_lift)
+
+	def backUp(self):
+
+		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		# target position to back up to in the map frame 
+		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
+
+		self.track_motion(self.target_backup_map)
+
+		rospy.loginfo("back up complete")
+
+		return 
+
+
+	# TODO: figure out assumptions. Will the robot be directly in front of the object?
+	def pickUp(self, goal):
+
+		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
 
 		# make sure gripper is open
 		self.open_gripper()
@@ -263,26 +286,40 @@ class GraspAction(object):
 
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
 
-
-		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
-		# target position to back up to in the map frame 
-		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
-
-		self.track_motion(self.target_backup_map)
-
-		rospy.loginfo("back up complete")
+		self.backUp()
 
 		self.body.move_to_neutral()
 
-		rospy.loginfo("close gripper")
-		
-
 		self._as.set_succeeded()
 
-	# TODO
-	def setDown():
+	def putDown(self, goal):
 
+		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
+		
+		goal_obj_arm_lift_link = target_pose_arm_lift.pose.position.z	
+
+		arm_obj_lift_val = min(goal_obj_arm_lift_link+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
+		obj_arm_flex_joint = -1.57
+		
+		self.body.move_to_joint_positions({'arm_flex_joint': obj_arm_flex_joint, 'wrist_flex_joint': 0.0, 'arm_lift_joint':arm_obj_lift_val})
+
+		self.track_motion(target_pose_map)
+		
+		rospy.sleep(2.0)	
+		
+		self.body.move_to_joint_positions({'arm_lift_joint':goal_obj_arm_lift_link })
+		
 		self.open_gripper()
+
+		arm_obj_lift_val = min(self.cur_arm_lift+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
+
+		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
+
+		self.backUp()
+		
+		self.body.move_to_neutral()
+		
+		self._putdown_as.set_succeeded()
 
 	def joint_state_Cb(self, msg):
 		self.cur_arm_flex=msg.position[0]

@@ -35,6 +35,7 @@ add_action_files(
   FILES
    MoveGripper.action
    pickUp.action
+   putDown.action
 )
 
 generate_messages(
