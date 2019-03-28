@@ -58,44 +58,6 @@ class GraspAction(object):
 
 
 		self.listener=tf.TransformListener()
-		# # # transform from base frame to map frame
-		# self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
-
-		# # ---------------------------------------------------------------------
-
-		# t = self.listener.getLatestCommonTime(_BASE_TF, _MAP_TF)
-		# position, quaternion = self.listener.lookupTransform(_BASE_TF, _MAP_TF, t)
-		# print "map wrt to base"
-		# print "position", position
-		# print " "
-		# print "quaternion", quaternion
-		# print " "
-
-		# e = tf.transformations.euler_from_quaternion(quaternion)
-		# R_map_wrt_base = tf.transformations.euler_matrix(e[0], e[1], e[2], 'rxyz')
-		# self.R_map_wrt_base = R_map_wrt_base[:3,:3]
-
-		# print "self.R_map_wrt_base"
-		# print self.R_map_wrt_base 
-
-		# self.x_align = True if np.abs(self.R_map_wrt_base[0,0]) >= np.abs(self.R_map_wrt_base[1,0]) else False  
-		# print np.abs(self.R_map_wrt_base[0,0])
-		# print np.abs(self.R_map_wrt_base[1,0]) 
-		# print self.x_align 
-
-		# # t2 = listener.getLatestCommonTime(_HEAD_TF, _MAP_TF)
-		# # position, quaternion = listener.lookupTransform(_HEAD_TF, _MAP_TF, t2)
-		# # print "map wrt to head"
-		# # print "position", position
-		# # print " "
-		# # print "quaternion", quaternion
-		
-
-		# exit()
-		# ----------------------------------------------------------------------
-
-
-		
 
 		self.vel_pub = rospy.Publisher('/hsrb/command_velocity', geometry_msgs.msg.Twist, queue_size=10)
 
@@ -127,10 +89,11 @@ class GraspAction(object):
 
 	def compute_error(self, target_map):
 
-		self.listener.waitForTransform(_ORIGIN_TF,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
-		self.target_pose_base = self.listener.transformPose(_BASE_TF, target_map)
+		# self.listener.waitForTransform(_ORIGIN_TF,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
+		# self.target_pose_base = self.listener.transformPose(_BASE_TF, target_map)
 
 		self.listener.waitForTransform(_MAP_TF,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
+		self.target_pose_base = self.listener.transformPose(_BASE_TF, target_map)
 		self.curr_pose_base = self.listener.transformPose(_BASE_TF, self.robot_pos)
 
 		# target location
@@ -225,12 +188,12 @@ class GraspAction(object):
 
 		return 	
 
-	def get_target_pose(self, goal):
+	def get_target_pose(self, goal_rgbd_sensor_link):
 			
-		self.target_pose=goal.target_pose
+		self.target_pose=goal_rgbd_sensor_link.target_pose
 
 		# account for length of arm fully extended
-		self.target_pose.pose.position.y=self.target_pose.pose.position.y-ARM_LENGTH
+		self.target_pose.pose.position.z=self.target_pose.pose.position.z-ARM_LENGTH
 
 		self.listener.waitForTransform(_ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_map = self.listener.transformPose(_MAP_TF,self.target_pose)

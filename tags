@@ -22,25 +22,27 @@ _MAP_TF	scripts/grasp_server.py	/^_MAP_TF = 'map'$/;"	v
 _ORIGIN_TF	scripts/grasp_server.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link' $/;"	v
 _ORIGIN_TF	src/grasp_client.py	/^_ORIGIN_TF = 'base_link' # TODO$/;"	v
 _ORIGIN_TF	src/grasp_client.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link'$/;"	v
+_ORIGIN_TF	src/putDown_client.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link'$/;"	v
 __init__	scripts/grasp_server.py	/^	def __init__(self, robot):$/;"	m	class:GraspAction
 __init__	scripts/movegripper_actionserver.py	/^	def __init__(self, name, robot):$/;"	m	class:MoveGripperAction
-backUp	scripts/grasp_server.py	/^        def backUp(self, goal):$/;"	f	function:GraspAction.track_motion
+backUp	scripts/grasp_server.py	/^	def backUp(self):$/;"	m	class:GraspAction
 close_gripper	scripts/grasp_server.py	/^	def close_gripper(self, to_width=-0.01):$/;"	m	class:GraspAction
 close_gripper	scripts/movegripper_actionserver.py	/^	def close_gripper(self, to_width=-0.01):$/;"	m	class:MoveGripperAction
 compute_error	scripts/grasp_server.py	/^	def compute_error(self, target_map):$/;"	m	class:GraspAction
 execute_cb	scripts/movegripper_actionserver.py	/^	def execute_cb(self, goal):$/;"	m	class:MoveGripperAction
-get_target_pose	scripts/grasp_server.py	/^        def get_target_pose(self, goal):$/;"	f	function:GraspAction.track_motion
+get_target_pose	scripts/grasp_server.py	/^	def get_target_pose(self, goal):$/;"	m	class:GraspAction
 get_vel_command	scripts/grasp_server.py	/^	def get_vel_command(self, error_norm, error): $/;"	m	class:GraspAction
 joint_state_Cb	scripts/grasp_server.py	/^	def joint_state_Cb(self, msg):$/;"	m	class:GraspAction
 main	src/grasp_client.py	/^def main():$/;"	f
 main	src/gripper_client.py	/^def main():$/;"	f
+main	src/putDown_client.py	/^def main():$/;"	f
 open_gripper	scripts/grasp_server.py	/^	def open_gripper(self,to_width=1.2):$/;"	m	class:GraspAction
 open_gripper	scripts/movegripper_actionserver.py	/^	def open_gripper(self,to_width=1.2):$/;"	m	class:MoveGripperAction
 pickUp	scripts/grasp_server.py	/^	def pickUp(self, goal):$/;"	m	class:GraspAction
 pose_callback	scripts/grasp_server.py	/^	def pose_callback(self,msg):$/;"	m	class:GraspAction
+putDown	scripts/grasp_server.py	/^	def putDown(self, goal):$/;"	m	class:GraspAction
 robot	scripts/grasp_server.py	/^	robot = Robot()$/;"	v
 robot	scripts/movegripper_actionserver.py	/^	robot = Robot()$/;"	v
 server	scripts/grasp_server.py	/^	server=GraspAction(robot)$/;"	v
 server	scripts/movegripper_actionserver.py	/^	server=MoveGripperAction('gripperaction',robot)$/;"	v
-setDown	scripts/grasp_server.py	/^	def setDown():$/;"	m	class:GraspAction
 track_motion	scripts/grasp_server.py	/^	def track_motion(self, target_map):$/;"	m	class:GraspAction
