@@ -11,7 +11,6 @@ from hsr_manipulation_2019.msg import *
 import rospy
 
 
-_ORIGIN_TF = 'base_link' # TODO
 _ORIGIN_TF = 'head_rgbd_sensor_link'
 
 def main():
