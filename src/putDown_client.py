@@ -6,22 +6,21 @@ from geometry_msgs.msg import Point, PoseStamped, Quaternion
 from std_msgs.msg import Int32MultiArray
 from hsrb_interface import Robot
 from hsrb_interface import exceptions
-from manip_prelim.msg import *
+from hsr_manipulation_2019.msg import *
 
 import rospy
 
 
-# _ORIGIN_TF = 'base_link' # TODO
 _ORIGIN_TF = 'head_rgbd_sensor_link'
 
 def main():
-	client = actionlib.SimpleActionClient('putDownaction', manip_prelim.msg.pickUpAction)
+	client = actionlib.SimpleActionClient('putDownaction', hsr_manipulation_2019.msg.pickUpAction)
 
 	client.wait_for_server()
 
 	curr_time=rospy.get_time()
 
-	goal = manip_prelim.msg.putDownGoal()
+	goal = hsr_manipulation_2019.msg.putDownGoal()
 
 	# base frame
 	# goal.target_pose.pose.position.x=0.5

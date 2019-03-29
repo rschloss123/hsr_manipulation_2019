@@ -10,7 +10,7 @@ from hsrb_interface import Robot, exceptions, geometry
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
 
-from manip_prelim.msg import *
+from hsr_manipulation_2019.msg import *
 import math
 
 import numpy as np 
@@ -80,9 +80,9 @@ class GraspAction(object):
 		# navigation client to move the base 
 		self.navi_cli = actionlib.SimpleActionClient('/move_base/move', MoveBaseAction)
 
-		self._as = actionlib.SimpleActionServer('pickUpaction', manip_prelim.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
+		self._as = actionlib.SimpleActionServer('pickUpaction', hsr_manipulation_2019.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
 		
-		self._putdown_as = actionlib.SimpleActionServer('putDownaction', manip_prelim.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
+		self._putdown_as = actionlib.SimpleActionServer('putDownaction', hsr_manipulation_2019.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
 
 		self._as.start()
 		self._putdown_as.start()

@@ -30,7 +30,7 @@ close_gripper	scripts/grasp_server.py	/^	def close_gripper(self, to_width=-0.01)
 close_gripper	scripts/movegripper_actionserver.py	/^	def close_gripper(self, to_width=-0.01):$/;"	m	class:MoveGripperAction
 compute_error	scripts/grasp_server.py	/^	def compute_error(self, target_map):$/;"	m	class:GraspAction
 execute_cb	scripts/movegripper_actionserver.py	/^	def execute_cb(self, goal):$/;"	m	class:MoveGripperAction
-get_target_pose	scripts/grasp_server.py	/^	def get_target_pose(self, goal):$/;"	m	class:GraspAction
+get_target_pose	scripts/grasp_server.py	/^	def get_target_pose(self, goal_rgbd_sensor_link):$/;"	m	class:GraspAction
 get_vel_command	scripts/grasp_server.py	/^	def get_vel_command(self, error_norm, error): $/;"	m	class:GraspAction
 joint_state_Cb	scripts/grasp_server.py	/^	def joint_state_Cb(self, msg):$/;"	m	class:GraspAction
 main	src/grasp_client.py	/^def main():$/;"	f

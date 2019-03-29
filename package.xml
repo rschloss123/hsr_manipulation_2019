@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>manip_prelim</name>
+  <name>hsr_manipulation_2019</name>
   <version>0.0.0</version>
-  <description>The manip_prelim package</description>
+  <description>The hsr_manipulation_2019 package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/manip_prelim</url> -->
+  <!-- <url type="website">http://wiki.ros.org/hsr_manipulation_2019</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->

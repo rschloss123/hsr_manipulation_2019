@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(manip_prelim)
+project(hsr_manipulation_2019)
 
 set(CMAKE_CXX_STANDARD 11)
 
