@@ -255,10 +255,10 @@ class GraspAction(object):
 		arm_obj_lift_val = min(self.cur_arm_lift+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
 
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
-#
-#		self.backUp()
-#
-#		self.body.move_to_neutral()
+
+		self.backUp()
+
+		self.body.move_to_neutral()
 
 		self._as.set_succeeded()
 
