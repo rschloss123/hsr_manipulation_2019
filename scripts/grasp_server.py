@@ -23,7 +23,8 @@ _MAP_TF = 'map'
 _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
 _ORIGIN_TF = 'head_rgbd_sensor_link' 
-ARM_LENGTH = 0.35; # distance from shoulder joint to wrist joints. measured on the robot
+ARM_LENGTH = 0.47625 #0.35; # distance from shoulder joint to wrist joints. measured on the robot
+HAND_LENGTH = 0.1524 # distance from end of arm to gripper pads
 MAX_ARM_LIFT=0.69 #joint limit of arm lift joint 
 OBJECT_LIFT_OFFSET = 0.04
 MAX_V = 0.2
@@ -114,8 +115,6 @@ class GraspAction(object):
 		curr_rz = self.curr_pose_base.pose.orientation.z
 		curr_rw = self.curr_pose_base.pose.orientation.w   
 
-		current_pose_map = self.listener.transformPose(_MAP_TF, self.robot_pos)
-
 		error_x = target_x-curr_x
 		error_y = target_y-curr_y
 		error_x_norm = LA.norm(error_x) #+ LA.norm(target_y-curr_y) + LA.norm(target_z-curr_z) + LA.norm(target_rx - curr_rx) + LA.norm(target_ry-curr_ry) + LA.norm(target_rz - curr_rz) + LA.norm(target_rw - curr_rw)		
@@ -128,7 +127,7 @@ class GraspAction(object):
 			# print "curr_y",curr_y
 			# print ""
 			print "current_pose_map \n"
-			print current_pose_map
+			print self.robot_pos
 
 			self.print_count = 0 
 		else: 
@@ -197,7 +196,7 @@ class GraspAction(object):
 		self.target_pose=goal_rgbd_sensor_link.target_pose
 
 		# account for length of arm fully extended
-		self.target_pose.pose.position.z=self.target_pose.pose.position.z-ARM_LENGTH
+		self.target_pose.pose.position.z=self.target_pose.pose.position.z-ARM_LENGTH-HAND_LENGTH
 
 		self.listener.waitForTransform(_ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_map = self.listener.transformPose(_MAP_TF,self.target_pose)
@@ -245,6 +244,10 @@ class GraspAction(object):
 		print "forward motion complete"
 		
 		rospy.sleep(2.0)
+
+		print "current_pose_map \n"
+		print self.robot_pos
+
 		self.close_gripper()
 		self.gripper_state=False
 		rospy.loginfo("close_gripper")
