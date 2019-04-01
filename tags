@@ -20,7 +20,6 @@ _BASE_TF	scripts/grasp_server.py	/^_BASE_TF = 'base_link'$/;"	v
 _HEAD_TF	scripts/grasp_server.py	/^_HEAD_TF = 'head_rgbd_sensor_link'$/;"	v
 _MAP_TF	scripts/grasp_server.py	/^_MAP_TF = 'map'$/;"	v
 _ORIGIN_TF	scripts/grasp_server.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link' $/;"	v
-_ORIGIN_TF	src/grasp_client.py	/^_ORIGIN_TF = 'base_link' # TODO$/;"	v
 _ORIGIN_TF	src/grasp_client.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link'$/;"	v
 _ORIGIN_TF	src/putDown_client.py	/^_ORIGIN_TF = 'head_rgbd_sensor_link'$/;"	v
 __init__	scripts/grasp_server.py	/^	def __init__(self, robot):$/;"	m	class:GraspAction

@@ -114,18 +114,22 @@ class GraspAction(object):
 		curr_rz = self.curr_pose_base.pose.orientation.z
 		curr_rw = self.curr_pose_base.pose.orientation.w   
 
+		current_pose_map = self.listener.transformPose(_MAP_TF, self.robot_pos)
 
 		error_x = target_x-curr_x
 		error_y = target_y-curr_y
 		error_x_norm = LA.norm(error_x) #+ LA.norm(target_y-curr_y) + LA.norm(target_z-curr_z) + LA.norm(target_rx - curr_rx) + LA.norm(target_ry-curr_ry) + LA.norm(target_rz - curr_rz) + LA.norm(target_rw - curr_rw)		
 		error_y_norm = LA.norm(error_y)
 
-		if self.print_count == 1000: 
-			print "target_x", target_x
-			print "curr_x",curr_x
-			print "target_y", target_y
-			print "curr_y",curr_y
-			print ""
+		if self.print_count == 500: 
+			# print "target_x", target_x
+			# print "curr_x",curr_x
+			# print "target_y", target_y
+			# print "curr_y",curr_y
+			# print ""
+			print "current_pose_map \n"
+			print current_pose_map
+
 			self.print_count = 0 
 		else: 
 			self.print_count+=1 
@@ -175,13 +179,13 @@ class GraspAction(object):
 			# the velocity 
 			self.vel_pub.publish(tw)
 
-			if self.print_count == 1000: 
-				print "tw.linear.x", tw.linear.x
-				print "tw.linear.y", tw.linear.y 
-				print "error_x", error_x_norm
-				print "error_y", error_y_norm
-				print "prev_error_x", prev_error_x
-				print "prev_error_y", prev_error_y
+			# if self.print_count == 1000: 
+			# 	print "tw.linear.x", tw.linear.x
+			# 	print "tw.linear.y", tw.linear.y 
+			# 	print "error_x", error_x_norm
+			# 	print "error_y", error_y_norm
+			# 	print "prev_error_x", prev_error_x
+			# 	print "prev_error_y", prev_error_y
 
 
 			error_x_norm, error_y_norm, error_x, error_y = self.compute_error(target_map)
@@ -200,7 +204,7 @@ class GraspAction(object):
 		self.listener.waitForTransform(_ORIGIN_TF,_ARM_LIFT_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_arm_lift = self.listener.transformPose(_ARM_LIFT_TF,self.target_pose)
 
-		print "target_pose_map"
+		print "target_pose_map \n"
 		print target_pose_map
 
 		return (target_pose_map, target_pose_arm_lift)
@@ -248,16 +252,19 @@ class GraspAction(object):
 		arm_obj_lift_val = min(self.cur_arm_lift+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
 
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
-
-		self.backUp()
-
-		self.body.move_to_neutral()
+#
+#		self.backUp()
+#
+#		self.body.move_to_neutral()
 
 		self._as.set_succeeded()
 
 	def putDown(self, goal):
 
 		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
+
+		print "target_pose_map"
+		print target_pose_map
 		
 		goal_obj_arm_lift_link = target_pose_arm_lift.pose.position.z	
 
