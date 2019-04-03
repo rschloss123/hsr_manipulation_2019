@@ -23,10 +23,11 @@ _MAP_TF = 'map'
 _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
 _ORIGIN_TF = 'head_rgbd_sensor_link' 
-ARM_LENGTH = 0.48#0.47625 #0.35; # distance from shoulder joint to wrist joints. measured on the robot
-HAND_LENGTH = 0.16   #0.1524 # distance from end of arm to gripper pads
+ARM_LENGTH = 0.48 # distance from shoulder joint to wrist joints. measured on the robot
+HAND_LENGTH = 0.16   # distance from end of arm to gripper pads
 MAX_ARM_LIFT=0.69 #joint limit of arm lift joint 
 OBJECT_LIFT_OFFSET = 0.04
+BASE_ARM_OFFSET  = 0.1 # distance between base and arm
 MAX_V = 0.2
 MIN_V = 0.05
 ERROR_THRESHOLD = 0.01
@@ -100,7 +101,7 @@ class GraspAction(object):
 
 		# target location
 		target_x = self.target_pose_base.pose.position.x 
-		target_y = self.target_pose_base.pose.position.y-0.1
+		target_y = self.target_pose_base.pose.position.y-BASE_ARM_OFFSET 
 		target_z = self.target_pose_base.pose.position.z
 		target_rx = self.target_pose_base.pose.orientation.x
 		target_ry = self.target_pose_base.pose.orientation.y
@@ -118,7 +119,7 @@ class GraspAction(object):
 
 		error_x = target_x-curr_x
 		error_y = target_y-curr_y
-		error_x_norm = LA.norm(error_x) #+ LA.norm(target_y-curr_y) + LA.norm(target_z-curr_z) + LA.norm(target_rx - curr_rx) + LA.norm(target_ry-curr_ry) + LA.norm(target_rz - curr_rz) + LA.norm(target_rw - curr_rw)		
+		error_x_norm = LA.norm(error_x)
 		error_y_norm = LA.norm(error_y)
 
 		if self.print_count == 500: 
@@ -217,7 +218,7 @@ class GraspAction(object):
 
 		#self.track_motion(self.target_backup_map)
 
-		#######ryan commented out the above
+		#
 		self.base.go_rel(-0.3, 0.0, 0.0)
 
 		rospy.loginfo("back up complete")
