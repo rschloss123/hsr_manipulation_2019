@@ -23,8 +23,8 @@ _MAP_TF = 'map'
 _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
 _ORIGIN_TF = 'head_rgbd_sensor_link' 
-ARM_LENGTH = 0.47625 #0.35; # distance from shoulder joint to wrist joints. measured on the robot
-HAND_LENGTH = 0.1524 # distance from end of arm to gripper pads
+ARM_LENGTH = 0.48#0.47625 #0.35; # distance from shoulder joint to wrist joints. measured on the robot
+HAND_LENGTH = 0.16   #0.1524 # distance from end of arm to gripper pads
 MAX_ARM_LIFT=0.69 #joint limit of arm lift joint 
 OBJECT_LIFT_OFFSET = 0.04
 MAX_V = 0.2
@@ -71,6 +71,7 @@ class GraspAction(object):
 			try:
 				self.body=self.robot.try_get('whole_body')
 				self.gripper = self.robot.try_get('gripper')
+				self.base = self.robot.try_get('omni_base')
 				# self.base=self.robot.try_get('omni_base')
 				self.open_gripper()
 				self.body.move_to_neutral()
@@ -99,7 +100,7 @@ class GraspAction(object):
 
 		# target location
 		target_x = self.target_pose_base.pose.position.x 
-		target_y = self.target_pose_base.pose.position.y 
+		target_y = self.target_pose_base.pose.position.y-0.1
 		target_z = self.target_pose_base.pose.position.z
 		target_rx = self.target_pose_base.pose.orientation.x
 		target_ry = self.target_pose_base.pose.orientation.y
@@ -210,11 +211,14 @@ class GraspAction(object):
 
 	def backUp(self):
 
-		self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		#self.listener.waitForTransform(_BASE_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 		# target position to back up to in the map frame 
-		self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
+		#self.target_backup_map = self.listener.transformPose(_MAP_TF,self.target_backup)
 
-		self.track_motion(self.target_backup_map)
+		#self.track_motion(self.target_backup_map)
+
+		#######ryan commented out the above
+		self.base.go_rel(-0.3, 0.0, 0.0)
 
 		rospy.loginfo("back up complete")
 
