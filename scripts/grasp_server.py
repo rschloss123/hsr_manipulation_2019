@@ -81,7 +81,7 @@ class GraspAction(object):
 		# navigation client to move the base 
 		self.navi_cli = actionlib.SimpleActionClient('/move_base/move', MoveBaseAction)
 
-		self._as = actionlib.SimpleActionServer('pickUpaction', hsr_manipulation_2019.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
+		self._as = actionlib.SimpleActionServer('pickUpAction', hsr_manipulation_2019.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
 		
 		self._putdown_as = actionlib.SimpleActionServer('putDownaction', hsr_manipulation_2019.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
 
@@ -310,7 +310,7 @@ class GraspAction(object):
 
 	def close_gripper(self, to_width=-0.01):
 		# self.gripper.grasp(to_width)
-		self.gripper.apply_force(1.0)
+		self.gripper.apply_force(0.5)
 
 	# def navigation_action(goal_x,goal_y,goal_yaw):
 	# 	pose = PoseStamped()
