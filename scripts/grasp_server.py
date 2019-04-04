@@ -85,7 +85,7 @@ class GraspAction(object):
 
 		self._as = actionlib.SimpleActionServer('pickUpAction', hsr_manipulation_2019.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
 		
-		self._putdown_as = actionlib.SimpleActionServer('putDownaction', hsr_manipulation_2019.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
+		self._putdown_as = actionlib.SimpleActionServer('putDownAction', hsr_manipulation_2019.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
 
 		self._as.start()
 		self._putdown_as.start()
@@ -156,12 +156,25 @@ class GraspAction(object):
 		error_x_norm, error_y_norm, error_x, error_y  = self.compute_error(target_map)
 		original_error_x = error_x_norm 
 		original_error_y = error_y_norm 
-		prev_error_x = error_x_norm 
-		prev_error_y = error_y_norm 
 
 		print "original error x, y", original_error_x, original_error_y
-		
+	        # move left/right first	
+		while(error_y_norm > ERROR_THRESHOLD): 
 
+
+			tw = geometry_msgs.msg.Twist()
+			tw.linear.x = 0
+			tw.linear.y = 0
+
+			if error_y_norm > ERROR_THRESHOLD:
+				tw.linear.y = self.get_vel_command(error_y_norm, error_y)
+
+
+			self.vel_pub.publish(tw)
+
+			error_x_norm, error_y_norm, error_x, error_y = self.compute_error(target_map)
+
+			# the velocity 
 		while(error_x_norm > ERROR_THRESHOLD or error_y_norm > ERROR_THRESHOLD): 
 
 			# TODO consider twist errors?  
@@ -174,8 +187,6 @@ class GraspAction(object):
 			if error_y_norm > ERROR_THRESHOLD:
 				tw.linear.y = self.get_vel_command(error_y_norm, error_y)
 
-			prev_error_x = error_x_norm 
-			prev_error_y = error_y_norm 			
 
 			# the velocity 
 			self.vel_pub.publish(tw)
@@ -185,8 +196,6 @@ class GraspAction(object):
 			# 	print "tw.linear.y", tw.linear.y 
 			# 	print "error_x", error_x_norm
 			# 	print "error_y", error_y_norm
-			# 	print "prev_error_x", prev_error_x
-			# 	print "prev_error_y", prev_error_y
 
 
 			error_x_norm, error_y_norm, error_x, error_y = self.compute_error(target_map)

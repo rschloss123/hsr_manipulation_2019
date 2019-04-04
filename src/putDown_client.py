@@ -14,7 +14,7 @@ import rospy
 _ORIGIN_TF = 'head_rgbd_sensor_link'
 
 def main():
-	client = actionlib.SimpleActionClient('putDownaction', hsr_manipulation_2019.msg.pickUpAction)
+	client = actionlib.SimpleActionClient('putDownAction', hsr_manipulation_2019.msg.pickUpAction)
 
 	client.wait_for_server()
 
@@ -35,7 +35,7 @@ def main():
 	# rgbd
 	goal.target_pose.pose.position.x=0.0
 	goal.target_pose.pose.position.y=.4 #.3 #0.5
-	goal.target_pose.pose.position.z=.4 #1
+	goal.target_pose.pose.position.z=1
 	goal.target_pose.pose.orientation.x=0.0
 	goal.target_pose.pose.orientation.y=0.0
 	goal.target_pose.pose.orientation.z=0.0
