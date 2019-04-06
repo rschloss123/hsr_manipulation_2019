@@ -9,6 +9,8 @@ from geometry_msgs.msg import *
 from hsrb_interface import Robot, exceptions, geometry
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from sensor_msgs.msg import JointState
+import moveit_commander
+import moveit_msgs.msg
 
 from hsr_manipulation_2019.msg import *
 import math
@@ -97,6 +99,7 @@ class GraspAction(object):
 
 		self._as.start()
 		self._putdown_as.start()
+		self._as_moveit.start()
 
 	def compute_error(self, target_map):
 
@@ -292,7 +295,7 @@ class GraspAction(object):
 		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
 		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
 		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z
-		our_goal.pose.orientation.w = 1.0  # goal.target_pose.pose.orientation.w
+		our_goal.pose.orientation.w = goal.target_pose.pose.orientation.w
 		our_goal.header.frame_id = goal.target_pose.header.frame_id
 
 		print

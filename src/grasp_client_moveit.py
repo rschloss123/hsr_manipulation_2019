@@ -14,13 +14,14 @@ _ORIGIN_TF = 'head_rgbd_sensor_link'
 
 
 def main():
+    print "starting"
     client = actionlib.SimpleActionClient('pickUpMoveitAction', hsr_manipulation_2019.msg.pickUpMoveitAction)
-
+    print "client made"
     client.wait_for_server()
-
+    print "got server"
     curr_time = rospy.get_time()
-
-    goal = hsr_manipulation_2019.msg.pickUpGoal()
+    print "making goal"
+    goal = hsr_manipulation_2019.msg.pickUpMoveitGoal()
 
     # base frame
     # goal.target_pose.pose.position.x=0.5
