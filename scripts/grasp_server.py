@@ -90,8 +90,10 @@ class GraspAction(object):
 		self.navi_cli = actionlib.SimpleActionClient('/move_base/move', MoveBaseAction)
 
 		self._as = actionlib.SimpleActionServer('pickUpAction', hsr_manipulation_2019.msg.pickUpAction, execute_cb=self.pickUp, auto_start=False)
-		
+
 		self._putdown_as = actionlib.SimpleActionServer('putDownAction', hsr_manipulation_2019.msg.putDownAction, execute_cb=self.putDown, auto_start=False)
+
+		self._as_moveit = actionlib.SimpleActionServer('pickUpMoveitAction', hsr_manipulation_2019.msg.pickUpMoveitAction,execute_cb=self.pickUpMoveit, auto_start=False)
 
 		self._as.start()
 		self._putdown_as.start()
@@ -279,6 +281,48 @@ class GraspAction(object):
 		self.backUp()
 
 		self.body.move_to_neutral()
+
+		self._as.set_succeeded()
+	def pickUpMoveit(self, goal):
+
+		our_goal = PoseStamped()
+		our_goal.pose.position.x = goal.target_pose.pose.position.x
+		our_goal.pose.position.y = goal.target_pose.pose.position.y
+		our_goal.pose.position.z = goal.target_pose.pose.position.z
+		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
+		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
+		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z
+		our_goal.pose.orientation.w = 1.0  # goal.target_pose.pose.orientation.w
+		our_goal.header.frame_id = goal.target_pose.header.frame_id
+
+		print
+		"We are in the pickUp Function"
+		# make sure gripper is open
+		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
+		self.gripper_moveit.go()
+		self.gripper_state = True
+
+		rospy.loginfo("open_gripper")
+
+		self.whole_body_moveit.set_joint_value_target(our_goal)
+		self.whole_body_moveit.go()
+
+		print "forward motion complete"
+
+		rospy.sleep(2.0)
+
+		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 0.0)
+		self.gripper_moveit.go()
+		self.gripper_state = False
+		rospy.loginfo("close_gripper")
+
+		# lift arm up and move backwards...I think
+		our_goal.pose.position.y = our_goal.pose.position.y - .4
+		our_goal.pose.position.z = our_goal.pose.position.z + .05
+		self.whole_body_moveit.set_joint_value_target(our_goal)
+		self.whole_body_moveit.go()
+
+		# self.backUp()
 
 		self._as.set_succeeded()
 
