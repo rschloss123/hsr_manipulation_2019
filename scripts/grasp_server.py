@@ -22,7 +22,7 @@ _BASE_TF = 'base_link'
 _MAP_TF = 'map'
 _HEAD_TF = 'head_rgbd_sensor_link'
 _ARM_LIFT_TF = 'arm_lift_link'
-_ORIGIN_TF = 'head_rgbd_sensor_link' 
+# _ORIGIN_TF = 'head_rgbd_sensor_link' 
 ARM_LENGTH = 0.48 # distance from shoulder joint to wrist joints. measured on the robot
 HAND_LENGTH = 0.16   # distance from end of arm to gripper pads
 MAX_ARM_LIFT=0.69 #joint limit of arm lift joint 
@@ -48,15 +48,15 @@ class GraspAction(object):
 
 
 		# in the base link frame
-		self.target_backup=PoseStamped()
-		self.target_backup.pose.position.x=-0.2
-		self.target_backup.pose.position.y=0.0
-		self.target_backup.pose.position.z=0.0
-		self.target_backup.pose.orientation.x=0.0
-		self.target_backup.pose.orientation.y=0.0
-		self.target_backup.pose.orientation.z=0.0
-		self.target_backup.pose.orientation.w=0.0
-		self.target_backup.header.frame_id=_BASE_TF
+		# self.target_backup=PoseStamped()
+		# self.target_backup.pose.position.x=-0.2
+		# self.target_backup.pose.position.y=0.0
+		# self.target_backup.pose.position.z=0.0
+		# self.target_backup.pose.orientation.x=0.0
+		# self.target_backup.pose.orientation.y=0.0
+		# self.target_backup.pose.orientation.z=0.0
+		# self.target_backup.pose.orientation.w=0.0
+		# self.target_backup.header.frame_id=_BASE_TF
 
 
 		self.listener=tf.TransformListener()
@@ -91,9 +91,6 @@ class GraspAction(object):
 		self._putdown_as.start()
 
 	def compute_error(self, target_map):
-
-		# self.listener.waitForTransform(_ORIGIN_TF,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
-		# self.target_pose_base = self.listener.transformPose(_BASE_TF, target_map)
 
 		self.listener.waitForTransform(_MAP_TF,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
 		self.target_pose_base = self.listener.transformPose(_BASE_TF, target_map)
@@ -209,9 +206,9 @@ class GraspAction(object):
 		# account for length of arm fully extended
 		self.target_pose.pose.position.z=self.target_pose.pose.position.z-ARM_LENGTH-HAND_LENGTH
 
-		self.listener.waitForTransform(_ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
+		self.listener.waitForTransform(self._ORIGIN_TF,_MAP_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_map = self.listener.transformPose(_MAP_TF,self.target_pose)
-		self.listener.waitForTransform(_ORIGIN_TF,_ARM_LIFT_TF,rospy.Time(),rospy.Duration(2.0))
+		self.listener.waitForTransform(self._ORIGIN_TF,_ARM_LIFT_TF,rospy.Time(),rospy.Duration(2.0))
 		target_pose_arm_lift = self.listener.transformPose(_ARM_LIFT_TF,self.target_pose)
 
 		print "target_pose_map \n"
@@ -246,6 +243,8 @@ class GraspAction(object):
 		self.gripper_state=True
 		rospy.loginfo("open_gripper")
 
+
+		self._ORIGIN_TF = goal.header.frame_id
 		obj_arm_lift_link = target_pose_arm_lift.pose.position.z
 		obj_arm_flex_joint = -1.57
 		
@@ -277,6 +276,8 @@ class GraspAction(object):
 		self._as.set_succeeded()
 
 	def putDown(self, goal):
+
+		self._ORIGIN_TF = goal.header.frame_id
 
 		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
 
@@ -325,28 +326,6 @@ class GraspAction(object):
 	def close_gripper(self, to_width=-0.01):
 		# self.gripper.grasp(to_width)
 		self.gripper.apply_force(0.5)
-
-	# def navigation_action(goal_x,goal_y,goal_yaw):
-	# 	pose = PoseStamped()
-	# 	pose.header.stamp = rospy.Time.now()
-	# 	pose.header.frame_id = "map"
-	# 	pose.pose.position = Point(goal_x, goal_y, 0)
-	# 	quat = tf.transformations.quaternion_from_euler(0, 0, goal_yaw)
-	# 	pose.pose.orientation = Quaternion(*quat)
-
-	# 	goal = MoveBaseGoal()
-	# 	goal.target_pose = pose
-
-	# 	# send message to the action server
-	# 	self.navi_cli.send_goal(goal)
-
-	# 	# wait for the action server to complete the order
-	# 	self.navi_cli.wait_for_result()
-
-	# 	# print result of navigation
-	# 	result_action_state = self.navi_cli.get_state()
-
-	# 	return #result_action_state 
 
 if __name__ == '__main__':
 	robot = Robot()
