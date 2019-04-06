@@ -76,6 +76,12 @@ class GraspAction(object):
 				# self.base=self.robot.try_get('omni_base')
 				self.open_gripper()
 				self.body.move_to_neutral()
+				#setup moveit
+				self.arm_moveit = moveit_commander.MoveGroupCommander("arm")
+				self.head_moveit = moveit_commander.MoveGroupCommander("head")
+				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
+				self.gripper_moveit = moveit_commander.MoveGroupCommander("gripper")
+				self.base_moveit = moveit_commander.MoveGroupCommander("base")
 				break 
 			except(exceptions.ResourceNotFoundError, exceptions.RobotConnectionError) as e:
 				rospy.logerr("Failed to obtain resource: {}\nRetrying...".format(e))
