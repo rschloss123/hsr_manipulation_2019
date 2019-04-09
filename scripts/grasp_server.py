@@ -83,6 +83,7 @@ class GraspAction(object):
 				self.arm_moveit = moveit_commander.MoveGroupCommander("arm")
 				self.head_moveit = moveit_commander.MoveGroupCommander("head")
 				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
+                                #self.whole_body_weighted_moveit = moveit_commander.MoveGroupCommander("whole_body_weighted")
 				self.gripper_moveit = moveit_commander.MoveGroupCommander("gripper")
 				self.base_moveit = moveit_commander.MoveGroupCommander("base")
 				self.scene = moveit_commander.PlanningSceneInterface()
@@ -92,13 +93,13 @@ class GraspAction(object):
 				rospy.sleep(1)
 
 				#add table
-				table_size = [.84, .76, .54]
+				table_size = [.84, .76, .8]
 				p = PoseStamped()
 				p.header.frame_id = "odom"
-				p.pose.position.x = .94
+				p.pose.position.x = 1.2 
 				p.pose.position.y = 0.0
-				p.pose.position.z = 0.0
-				p.pose.orientation.w = 1.0
+				p.pose.position.z = 0.4
+				p.pose.orientation.w = 0.0
 				self.scene.add_box("table",p,table_size)
 				rospy.sleep(1)
 
@@ -310,8 +311,8 @@ class GraspAction(object):
 		our_goal.pose.position.y = goal.target_pose.pose.position.y
 		our_goal.pose.position.z = goal.target_pose.pose.position.z
 		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
-		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
-		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z
+		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y+0.785
+		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z-1.0
 		our_goal.pose.orientation.w = goal.target_pose.pose.orientation.w
 		our_goal.header.frame_id = goal.target_pose.header.frame_id
 
@@ -326,7 +327,8 @@ class GraspAction(object):
 
 		self.whole_body_moveit.set_joint_value_target(our_goal)
 		self.whole_body_moveit.go()
-
+		#self.whole_body_weighted_moveit.set_joint_value_target(our_goal)
+		#self.whole_body_weighted_moveit.go()
 		print "forward motion complete"
 
 		rospy.sleep(2.0)
@@ -337,14 +339,18 @@ class GraspAction(object):
 		rospy.loginfo("close_gripper")
 
 		# lift arm up and move backwards...I think
-		our_goal.pose.position.y = our_goal.pose.position.y - .4
-		our_goal.pose.position.z = our_goal.pose.position.z + .05
-		self.whole_body_moveit.set_joint_value_target(our_goal)
-		self.whole_body_moveit.go()
+#		our_goal.pose.position.y = our_goal.pose.position.y - .4
+#		our_goal.pose.position.z = our_goal.pose.position.z + .05
+#		self.whole_body_moveit.set_joint_value_target(our_goal)
+#		self.whole_body_moveit.go()
 
-		# self.backUp()
 
-		self._as.set_succeeded()
+		arm_obj_lift_val = min(self.cur_arm_lift+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
+
+		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
+
+		self.backUp()
+                self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
