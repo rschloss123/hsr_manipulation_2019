@@ -79,6 +79,7 @@ class GraspAction(object):
 				self.open_gripper()
 				self.body.move_to_neutral()
 				#setup moveit
+                                moveit_commander.roscpp_initialize(sys.argv)
 				self.arm_moveit = moveit_commander.MoveGroupCommander("arm")
 				self.head_moveit = moveit_commander.MoveGroupCommander("head")
 				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
@@ -245,7 +246,7 @@ class GraspAction(object):
 
 	# TODO: figure out assumptions. Will the robot be directly in front of the object?
 	def pickUp(self, goal):
-
+                self._ORIGIN_TF = goal.target_pose.header.frame_id
 		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
 
 		# make sure gripper is open
@@ -255,7 +256,7 @@ class GraspAction(object):
 		rospy.loginfo("open_gripper")
 
 
-		self._ORIGIN_TF = goal.header.frame_id
+		
 		obj_arm_lift_link = target_pose_arm_lift.pose.position.z
 		obj_arm_flex_joint = -1.57
 		
@@ -382,6 +383,7 @@ class GraspAction(object):
 
 if __name__ == '__main__':
 	robot = Robot()
+        #rospy.init_node("ee_control_node", anonymous=True)
 	rospy.loginfo("Initializing givepose server")
 	server=GraspAction(robot)
 	rospy.loginfo("grasp_action_server created")
