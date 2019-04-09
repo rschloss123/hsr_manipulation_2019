@@ -85,7 +85,24 @@ class GraspAction(object):
 				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
 				self.gripper_moveit = moveit_commander.MoveGroupCommander("gripper")
 				self.base_moveit = moveit_commander.MoveGroupCommander("base")
-				break 
+				self.scene = moveit_commander.PlanningSceneInterface()
+				self.scene_pub = rospy.Publisher('planning_scene',
+												 moveit_msgs.msg.PlanningScene,
+												 queue_size=5)
+				rospy.sleep(1)
+
+				#add table
+				table_size = [.84, .76, .54]
+				p = PoseStamped()
+				p.header.frame_id = "odom"
+				p.pose.position.x = .94
+				p.pose.position.y = 0.0
+				p.pose.position.z = 0.0
+				p.pose.orientation.w = 1.0
+				self.scene.add_box("table",p,table_size)
+				rospy.sleep(1)
+
+				break
 			except(exceptions.ResourceNotFoundError, exceptions.RobotConnectionError) as e:
 				rospy.logerr("Failed to obtain resource: {}\nRetrying...".format(e))
 
