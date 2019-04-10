@@ -312,7 +312,7 @@ class GraspAction(object):
 		our_goal.pose.position.z = goal.target_pose.pose.position.z
 		our_goal.pose.orientation.x = 0 #goal.target_pose.pose.orientation.x
                 our_goal.pose.orientation.y = 0 #goal.target_pose.pose.orientation.y+0.785
-		our_goal.pose.orientation.z = 0.707 #goal.target_pose.pose.orientation.z-1.0
+		our_goal.pose.orientation.z = -0.707 #goal.target_pose.pose.orientation.z-1.0
 		our_goal.pose.orientation.w = 0.707 #goal.target_pose.pose.orientation.w
 		our_goal.header.frame_id = goal.target_pose.header.frame_id
 
