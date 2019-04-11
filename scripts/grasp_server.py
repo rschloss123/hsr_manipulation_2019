@@ -310,13 +310,21 @@ class GraspAction(object):
 		our_goal.pose.position.x = goal.target_pose.pose.position.x
 		our_goal.pose.position.y = goal.target_pose.pose.position.y
 		our_goal.pose.position.z = goal.target_pose.pose.position.z
-		our_goal.pose.orientation.x = 0 #goal.target_pose.pose.orientation.x
-                our_goal.pose.orientation.y = 0 #goal.target_pose.pose.orientation.y+0.785
-		our_goal.pose.orientation.z = -0.707 #goal.target_pose.pose.orientation.z-1.0
-		our_goal.pose.orientation.w = 0.707 #goal.target_pose.pose.orientation.w
+		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
+                our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
+		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z #-0.707
+		our_goal.pose.orientation.w = goal.target_pose.pose.orientation.w # 0.707
 		our_goal.header.frame_id = goal.target_pose.header.frame_id
 
-		print
+		self.listener.waitForTransform(our_goal.header.frame_id,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
+		our_goal_base = self.listener.transformPose(_BASE_TF, our_goal)
+
+		our_goal_base.pose.orientation.x = 0.707
+                our_goal_base.pose.orientation.y = 0.0
+		our_goal_base.pose.orientation.z = 0.707
+                our_goal_base.pose.orientation.w = 0.0
+		
+                print
 		"We are in the pickUp Function"
 		# make sure gripper is open
 		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
@@ -325,7 +333,8 @@ class GraspAction(object):
 
 		rospy.loginfo("open_gripper")
 
-		self.whole_body_moveit.set_joint_value_target(our_goal)
+		#self.whole_body_moveit.set_joint_value_target(our_goal)
+		self.whole_body_moveit.set_joint_value_target(our_goal_base)
 		self.whole_body_moveit.go()
 		#self.whole_body_weighted_moveit.set_joint_value_target(our_goal)
 		#self.whole_body_weighted_moveit.go()
