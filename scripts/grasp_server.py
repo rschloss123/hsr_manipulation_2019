@@ -12,6 +12,11 @@ from sensor_msgs.msg import JointState
 import moveit_commander
 import moveit_msgs.msg
 
+import sensor_msgs
+import pcl_conversions
+import pcl
+
+
 from hsr_manipulation_2019.msg import *
 import math
 
@@ -69,6 +74,8 @@ class GraspAction(object):
 		rospy.Subscriber(global_pose_topic, PoseStamped, self.pose_callback)
 		joint_states_topic = 'hsrb/joint_states'
 		rospy.Subscriber(joint_states_topic, JointState, self.joint_state_Cb)
+		depth_image_rect = 'hsrb/head_rgbd_sensor/depth_registered/rectified_points' #or image_rect_raw
+		#Todo rospy.Subscriber(depth_image_rect, PointCloud2, self.)
 
 		while not rospy.is_shutdown():
 			try:
@@ -79,11 +86,11 @@ class GraspAction(object):
 				self.open_gripper()
 				self.body.move_to_neutral()
 				#setup moveit
-                                moveit_commander.roscpp_initialize(sys.argv)
+								moveit_commander.roscpp_initialize(sys.argv)
 				self.arm_moveit = moveit_commander.MoveGroupCommander("arm")
 				self.head_moveit = moveit_commander.MoveGroupCommander("head")
 				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
-                                #self.whole_body_weighted_moveit = moveit_commander.MoveGroupCommander("whole_body_weighted")
+				#self.whole_body_weighted_moveit = moveit_commander.MoveGroupCommander("whole_body_weighted")
 				self.gripper_moveit = moveit_commander.MoveGroupCommander("gripper")
 				self.base_moveit = moveit_commander.MoveGroupCommander("base")
 				self.scene = moveit_commander.PlanningSceneInterface()
@@ -185,7 +192,7 @@ class GraspAction(object):
 		original_error_y = error_y_norm 
 
 		print "original error x, y", original_error_x, original_error_y
-	        # move left/right first	
+			# move left/right first
 		while(error_y_norm > ERROR_THRESHOLD): 
 
 
@@ -264,7 +271,7 @@ class GraspAction(object):
 
 	# TODO: figure out assumptions. Will the robot be directly in front of the object?
 	def pickUp(self, goal):
-                self._ORIGIN_TF = goal.target_pose.header.frame_id
+				self._ORIGIN_TF = goal.target_pose.header.frame_id
 		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
 
 		# make sure gripper is open
@@ -359,7 +366,7 @@ class GraspAction(object):
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
 
 		self.backUp()
-                self._as_moveit.set_succeeded()
+				self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
@@ -401,6 +408,8 @@ class GraspAction(object):
 		self.cur_arm_roll=msg.position[2]
 		self.cur_wrist_roll=msg.position[12]
 		self.cur_wrist_flex=msg.position[11]
+	#TODO def cloudCB(self, input)
+
 
 	def pose_callback(self,msg):
 		self.robot_pos.pose=msg.pose 
@@ -415,7 +424,7 @@ class GraspAction(object):
 
 if __name__ == '__main__':
 	robot = Robot()
-        #rospy.init_node("ee_control_node", anonymous=True)
+		#rospy.init_node("ee_control_node", anonymous=True)
 	rospy.loginfo("Initializing givepose server")
 	server=GraspAction(robot)
 	rospy.loginfo("grasp_action_server created")
