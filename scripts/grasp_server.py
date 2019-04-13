@@ -13,8 +13,8 @@ import moveit_commander
 import moveit_msgs.msg
 
 import sensor_msgs
-import pcl_conversions
-import pcl
+#import pcl_conversions
+#import pcl
 
 
 from hsr_manipulation_2019.msg import *
@@ -75,28 +75,30 @@ class GraspAction(object):
 		joint_states_topic = 'hsrb/joint_states'
 		rospy.Subscriber(joint_states_topic, JointState, self.joint_state_Cb)
 		depth_image_rect = 'hsrb/head_rgbd_sensor/depth_registered/rectified_points' #or image_rect_raw
-		#Todo rospy.Subscriber(depth_image_rect, PointCloud2, self.)
+		#rospy.Subscriber(depth_image_rect, PointCloud2, self.cloudCB) #Todo
 
 		while not rospy.is_shutdown():
 			try:
 				self.body=self.robot.try_get('whole_body')
 				self.gripper = self.robot.try_get('gripper')
 				self.base = self.robot.try_get('omni_base')
+
 				# self.base=self.robot.try_get('omni_base')
 				self.open_gripper()
 				self.body.move_to_neutral()
+
 				#setup moveit
-								moveit_commander.roscpp_initialize(sys.argv)
+				moveit_commander.roscpp_initialize(sys.argv)
+
 				self.arm_moveit = moveit_commander.MoveGroupCommander("arm")
 				self.head_moveit = moveit_commander.MoveGroupCommander("head")
 				self.whole_body_moveit = moveit_commander.MoveGroupCommander("whole_body")
-				#self.whole_body_weighted_moveit = moveit_commander.MoveGroupCommander("whole_body_weighted")
 				self.gripper_moveit = moveit_commander.MoveGroupCommander("gripper")
 				self.base_moveit = moveit_commander.MoveGroupCommander("base")
 				self.scene = moveit_commander.PlanningSceneInterface()
-				self.scene_pub = rospy.Publisher('planning_scene',
-												 moveit_msgs.msg.PlanningScene,
-												 queue_size=5)
+				#self.scene_pub = rospy.Publisher('planning_scene',
+												 #moveit_msgs.msg.PlanningScene,
+												 #queue_size=5)
 				rospy.sleep(1)
 
 				#add table
@@ -271,9 +273,8 @@ class GraspAction(object):
 
 	# TODO: figure out assumptions. Will the robot be directly in front of the object?
 	def pickUp(self, goal):
-				self._ORIGIN_TF = goal.target_pose.header.frame_id
+		self._ORIGIN_TF = goal.target_pose.header.frame_id
 		target_pose_map, target_pose_arm_lift = self.get_target_pose(goal)
-
 		# make sure gripper is open
 		self.open_gripper()
 		self.body.move_to_neutral()
@@ -318,7 +319,7 @@ class GraspAction(object):
 		our_goal.pose.position.y = goal.target_pose.pose.position.y
 		our_goal.pose.position.z = goal.target_pose.pose.position.z
 		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
-                our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
+		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
 		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z #-0.707
 		our_goal.pose.orientation.w = goal.target_pose.pose.orientation.w # 0.707
 		our_goal.header.frame_id = goal.target_pose.header.frame_id
@@ -327,11 +328,11 @@ class GraspAction(object):
 		our_goal_base = self.listener.transformPose(_BASE_TF, our_goal)
 
 		our_goal_base.pose.orientation.x = 0.707
-                our_goal_base.pose.orientation.y = 0.0
+		our_goal_base.pose.orientation.y = 0.0
 		our_goal_base.pose.orientation.z = 0.707
-                our_goal_base.pose.orientation.w = 0.0
+		our_goal_base.pose.orientation.w = 0.0
 		
-                print
+		print
 		"We are in the pickUp Function"
 		# make sure gripper is open
 		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
@@ -366,7 +367,7 @@ class GraspAction(object):
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
 
 		self.backUp()
-				self._as_moveit.set_succeeded()
+		self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
@@ -408,7 +409,7 @@ class GraspAction(object):
 		self.cur_arm_roll=msg.position[2]
 		self.cur_wrist_roll=msg.position[12]
 		self.cur_wrist_flex=msg.position[11]
-	#TODO def cloudCB(self, input)
+	#def cloudCB(self, input) #TODO
 
 
 	def pose_callback(self,msg):
