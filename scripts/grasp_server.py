@@ -125,9 +125,12 @@ class GraspAction(object):
 
 		self._as_moveit = actionlib.SimpleActionServer('pickUpMoveitAction', hsr_manipulation_2019.msg.pickUpMoveitAction,execute_cb=self.pickUpMoveit, auto_start=False)
 
-		self._as.start()
+		self._putdown_as_moveit = actionlib.SimpleActionServer('putDownMoveitAction', hsr_manipulation_2019.msg.putDownMoveitAction,execute_cb=self.putDownMoveit, auto_start=False)
+		
+                self._as.start()
 		self._putdown_as.start()
 		self._as_moveit.start()
+                self._putdown_as_moveit.start()
 
 	def compute_error(self, target_map):
 
@@ -312,6 +315,7 @@ class GraspAction(object):
 		self.body.move_to_neutral()
 
 		self._as.set_succeeded()
+
 	def pickUpMoveit(self, goal):
 
 		our_goal = PoseStamped()
@@ -367,7 +371,10 @@ class GraspAction(object):
 		self.body.move_to_joint_positions({'arm_lift_joint':arm_obj_lift_val})
 
 		self.backUp()
-		self._as_moveit.set_succeeded()
+		
+                self.body.move_to_neutral()
+		
+                self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
@@ -402,6 +409,54 @@ class GraspAction(object):
 		self.body.move_to_neutral()
 		
 		self._putdown_as.set_succeeded()
+	
+        def putDownMoveit(self, goal):
+
+		our_goal = PoseStamped()
+		our_goal.pose.position.x = goal.target_pose.pose.position.x
+		our_goal.pose.position.y = goal.target_pose.pose.position.y
+		our_goal.pose.position.z = goal.target_pose.pose.position.z
+		our_goal.pose.orientation.x = goal.target_pose.pose.orientation.x
+		our_goal.pose.orientation.y = goal.target_pose.pose.orientation.y
+		our_goal.pose.orientation.z = goal.target_pose.pose.orientation.z
+		our_goal.pose.orientation.w = goal.target_pose.pose.orientation.w 
+		our_goal.header.frame_id = goal.target_pose.header.frame_id
+
+		self.listener.waitForTransform(our_goal.header.frame_id,_BASE_TF,rospy.Time(),rospy.Duration(1.0))
+		our_goal_base = self.listener.transformPose(_BASE_TF, our_goal)
+
+
+                # when robot approaches table, have arm slightly higher than desired, final height
+                final_arm_height_desired = our_goal_base.pose.position.z
+                # height to lift arm to first`
+		arm_obj_lift_val = min(final_arm_height_desired+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
+
+		our_goal_base.pose.orientation.x = 0.707
+		our_goal_base.pose.orientation.y = 0.0
+		our_goal_base.pose.orientation.z = 0.707
+		our_goal_base.pose.orientation.w = 0.0
+		
+		print "We are in the putDown Function"
+
+		self.whole_body_moveit.set_joint_value_target(our_goal_base)
+		self.whole_body_moveit.go()
+		print "forward motion complete"
+
+		rospy.sleep(2.0)
+                
+                print "open gripper"
+                # open gripper 
+                self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
+                self.gripper_moveit.go()
+                self.gripper_state = True
+
+                rospy.loginfo("open_gripper")
+
+		self.backUp()
+
+		self.body.move_to_neutral()
+
+		self._putdown_as_moveit.set_succeeded()
 
 	def joint_state_Cb(self, msg):
 		self.cur_arm_flex=msg.position[0]
