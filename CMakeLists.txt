@@ -22,6 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
   tmc_manipulation_msgs
   tmc_planning_msgs
   tmc_utils
+  moveit_msgs
+  moveit_ros_planning_interface
 )
 
 
@@ -63,6 +65,7 @@ catkin_package(
   tmc_manipulation_types_bridge
   tmc_utils
   actionlib_msgs
+  moveit_msgs
 
 )
 
@@ -71,5 +74,7 @@ install(DIRECTORY scripts/
   USE_SOURCE_PERMISSIONS
 )
 
+add_executable(scene_updater src/scene_updater.cpp)
+target_link_libraries(scene_updater ${catkin_LIBRARIES})
 
 
