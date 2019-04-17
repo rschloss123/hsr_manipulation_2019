@@ -1,5 +1,5 @@
 <launch>
     <include file="$(find hsrb_moveit_config)/launch/hsrb_demo_with_controller.launch"/>
-
+    <include file="$(find hsrb_moveit_config)/launch/hsrb_moveit_sensor_manager.launch.xml"/>
 
 </launch>

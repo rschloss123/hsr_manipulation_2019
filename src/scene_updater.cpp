@@ -5,6 +5,7 @@
 #include <pcl/filters/extract_indices.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/segmentation/sac_segmentation.h>
+#include <iostream>
 
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/CollisionObject.h>
@@ -333,8 +334,11 @@ private:
 
 int main(int argc, char** argv)
 {
+  std::cout << "Intializing";
   // Initialize ROS
   ros::init(argc, argv, "cylinder_segment");
+  std::cout << "Starting Segmentor";
   // Start the segmentor
   SceneUpdater();
+  std::cout << "Started";
 }
