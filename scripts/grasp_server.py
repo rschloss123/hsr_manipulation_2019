@@ -334,8 +334,7 @@ class GraspAction(object):
 		our_goal_base.pose.orientation.z = 0.707
 		our_goal_base.pose.orientation.w = 0.0
 		
-		print
-		"We are in the pickUp Function"
+		rospy.loginfo("We are in the pickUp Function")
 		# make sure gripper is open
 		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
 		self.gripper_moveit.go()
@@ -352,7 +351,8 @@ class GraspAction(object):
 
 		rospy.sleep(2.0)
 
-		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 0.0)
+		#self.gripper_moveit.set_joint_value_target("hand_motor_joint", 0.0)
+		self.gripper_moveit.set_force_value_target("hand_motor_joint", 0.5)
 		self.gripper_moveit.go()
 		self.gripper_state = False
 		rospy.loginfo("close_gripper")
@@ -370,9 +370,9 @@ class GraspAction(object):
 
 		self.backUp()
 		
-				self.body.move_to_neutral()
-		
-				self._as_moveit.set_succeeded()
+		self.body.move_to_neutral()
+
+		self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
@@ -408,7 +408,7 @@ class GraspAction(object):
 		
 		self._putdown_as.set_succeeded()
 	
-		def putDownMoveit(self, goal):
+	def putDownMoveit(self, goal):
 
 		our_goal = PoseStamped()
 		our_goal.pose.position.x = goal.target_pose.pose.position.x
