@@ -352,8 +352,10 @@ class GraspAction(object):
 		rospy.sleep(2.0)
 
 		#self.gripper_moveit.set_joint_value_target("hand_motor_joint", 0.0)
-		self.gripper_moveit.set_force_value_target("hand_motor_joint", 0.5)
-		self.gripper_moveit.go()
+		#self.gripper_moveit.set_force_value_target("hand_motor_joint", 0.5)
+		#self.gripper_moveit.go()
+		#self.gripper_moveit.go()
+		self.gripper.apply_force(0.5)
 		self.gripper_state = False
 		rospy.loginfo("close_gripper")
 
