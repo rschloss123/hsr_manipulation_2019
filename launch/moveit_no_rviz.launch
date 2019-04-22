@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find hsrb_moveit_config)/launch/hsrb_moveit_no_rviz.launch"/>
+    <include file="$(find hsrb_moveit_config)/launch/hsrb_moveit_sensor_manager.launch.xml"/>
+    <include file="$(find manip_prelim)/launch/ar.launch"/>
+</launch>

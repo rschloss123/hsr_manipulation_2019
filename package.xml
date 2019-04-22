@@ -64,6 +64,8 @@
   <depend>tmc_planning_msgs</depend>
   <depend>tmc_utils</depend>
   <depend>trajectory_msgs</depend>
+  <depend>moveit_msgs</depend>
+  <depend>moveit_ros_planning_interface</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

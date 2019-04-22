@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ae39fac8-6fc0-48b9-aefb-361cb8dde5ca" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/launch/moveit_no_rviz.launch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/scene_maker.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/grasp_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/grasp_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/launch/moveit.launch" beforeDir="false" afterPath="$PROJECT_DIR$/launch/moveit.launch" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,14 +15,56 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/grasp_server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="102" column="30" selection-start-line="102" selection-start-column="30" selection-end-line="102" selection-end-column="30" />
-              <folding>
-                <element signature="e#23#35#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="451">
+              <caret line="433" column="29" selection-start-line="433" selection-start-column="29" selection-end-line="433" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/scene_updater.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2940">
+              <caret line="319" column="18" lean-forward="true" selection-start-line="319" selection-start-column="18" selection-end-line="319" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scene_maker.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-510">
+              <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/launch/moveit.launch">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="63" selection-start-line="2" selection-start-column="63" selection-end-line="2" selection-end-column="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="375">
+              <caret line="25" column="31" selection-start-line="25" selection-start-column="31" selection-end-line="25" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/package.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1005">
+              <caret line="67" column="39" selection-start-line="67" selection-start-column="39" selection-end-line="67" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -28,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/grasp_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="479">
+            <state relative-caret-position="360">
               <caret line="32" column="27" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
               <folding>
                 <element signature="e#24#40#0" expanded="true" />
@@ -41,7 +85,7 @@
         <entry file="file://$PROJECT_DIR$/TODO">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="75">
-              <caret line="5" lean-forward="true" selection-start-column="28" selection-end-line="5" />
+              <caret line="5" selection-start-column="28" selection-end-line="5" />
             </state>
           </provider>
         </entry>
@@ -64,7 +108,12 @@
     <findStrings>
       <find>pickUpMoveitAction</find>
       <find>pickup</find>
+      <find>CylinderSegment</find>
+      <find>moveit::</find>
     </findStrings>
+    <replaceStrings>
+      <replace>SceneUpdater</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -75,8 +124,13 @@
         <option value="$PROJECT_DIR$/action/pickUpMoveit.action" />
         <option value="$PROJECT_DIR$/action/putDown.action" />
         <option value="$PROJECT_DIR$/action/putDownMoveit.action" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/src/grasp_client_moveit.py" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/package.xml" />
+        <option value="$PROJECT_DIR$/src/scene_updater.cpp" />
+        <option value="$PROJECT_DIR$/launch/moveit.launch" />
+        <option value="$PROJECT_DIR$/launch/moveit_no_rviz.launch" />
+        <option value="$PROJECT_DIR$/src/scene_maker.cpp" />
         <option value="$PROJECT_DIR$/scripts/grasp_server.py" />
       </list>
     </option>
@@ -110,6 +164,11 @@
             <path>
               <item name="hsr_manipulation_2019" type="b2602c69:ProjectViewProjectNode" />
               <item name="hsr_manipulation_2019" type="462c0819:PsiDirectoryNode" />
+              <item name="launch" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="hsr_manipulation_2019" type="b2602c69:ProjectViewProjectNode" />
+              <item name="hsr_manipulation_2019" type="462c0819:PsiDirectoryNode" />
               <item name="scripts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -126,8 +185,13 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../manip_prelim" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../moveit/moveit_commander" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -159,7 +223,7 @@
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.2699115" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.19137168" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
@@ -199,13 +263,6 @@
     <entry file="file://$PROJECT_DIR$/action/MoveGripper.action">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="16" lean-forward="true" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/action/putDown.action">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -227,19 +284,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/grasp_client_moveit.py">
+    <entry file="jar://$APPLICATION_PLUGINS_DIR$/hatchery/lib/hatchery.zip!/edu/umontreal/hatchery/roslaunch/roslaunch.xsd">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="17" column="61" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="61" />
-          <folding>
-            <element signature="e#24#40#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="308">
+          <caret line="242" column="12" selection-start-line="242" selection-start-column="12" selection-end-line="242" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="31" selection-start-line="25" selection-start-column="31" selection-end-line="25" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1005">
+          <caret line="67" column="39" selection-start-line="67" selection-start-column="39" selection-end-line="67" selection-end-column="39" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/grasp_client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
+        <state relative-caret-position="360">
           <caret line="32" column="27" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
           <folding>
             <element signature="e#24#40#0" expanded="true" />
@@ -250,17 +318,52 @@
     <entry file="file://$PROJECT_DIR$/TODO">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
-          <caret line="5" lean-forward="true" selection-start-column="28" selection-end-line="5" />
+          <caret line="5" selection-start-column="28" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/grasp_client_moveit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="17" column="61" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="61" />
+          <folding>
+            <element signature="e#24#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launch/moveit_no_rviz.launch">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="9" lean-forward="true" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/launch/moveit.launch">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="63" selection-start-line="2" selection-start-column="63" selection-end-line="2" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scene_maker.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-510">
+          <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/grasp_server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="102" column="30" selection-start-line="102" selection-start-column="30" selection-end-line="102" selection-end-column="30" />
-          <folding>
-            <element signature="e#23#35#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="451">
+          <caret line="433" column="29" selection-start-line="433" selection-start-column="29" selection-end-line="433" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scene_updater.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2940">
+          <caret line="319" column="18" lean-forward="true" selection-start-line="319" selection-start-column="18" selection-end-line="319" selection-end-column="18" />
         </state>
       </provider>
     </entry>

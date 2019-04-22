@@ -74,8 +74,6 @@ class GraspAction(object):
 		rospy.Subscriber(global_pose_topic, PoseStamped, self.pose_callback)
 		joint_states_topic = 'hsrb/joint_states'
 		rospy.Subscriber(joint_states_topic, JointState, self.joint_state_Cb)
-		depth_image_rect = 'hsrb/head_rgbd_sensor/depth_registered/rectified_points' #or image_rect_raw
-		#rospy.Subscriber(depth_image_rect, PointCloud2, self.cloudCB) #Todo
 
 		while not rospy.is_shutdown():
 			try:
@@ -127,10 +125,10 @@ class GraspAction(object):
 
 		self._putdown_as_moveit = actionlib.SimpleActionServer('putDownMoveitAction', hsr_manipulation_2019.msg.putDownMoveitAction,execute_cb=self.putDownMoveit, auto_start=False)
 		
-                self._as.start()
+		self._as.start()
 		self._putdown_as.start()
 		self._as_moveit.start()
-                self._putdown_as_moveit.start()
+		self._putdown_as_moveit.start()
 
 	def compute_error(self, target_map):
 
@@ -336,8 +334,7 @@ class GraspAction(object):
 		our_goal_base.pose.orientation.z = 0.707
 		our_goal_base.pose.orientation.w = 0.0
 		
-		print
-		"We are in the pickUp Function"
+		rospy.loginfo("We are in the pickUp Function")
 		# make sure gripper is open
 		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
 		self.gripper_moveit.go()
@@ -355,6 +352,8 @@ class GraspAction(object):
 		rospy.sleep(2.0)
 
 		#self.gripper_moveit.set_joint_value_target("hand_motor_joint", 0.0)
+		#self.gripper_moveit.set_force_value_target("hand_motor_joint", 0.5)
+		#self.gripper_moveit.go()
 		#self.gripper_moveit.go()
 		self.gripper.apply_force(0.5)
 		self.gripper_state = False
@@ -373,9 +372,9 @@ class GraspAction(object):
 
 		self.backUp()
 		
-                self.body.move_to_neutral()
-		
-                self._as_moveit.set_succeeded()
+		self.body.move_to_neutral()
+
+		self._as_moveit.set_succeeded()
 
 	def putDown(self, goal):
 
@@ -411,7 +410,7 @@ class GraspAction(object):
 		
 		self._putdown_as.set_succeeded()
 	
-        def putDownMoveit(self, goal):
+	def putDownMoveit(self, goal):
 
 		our_goal = PoseStamped()
 		our_goal.pose.position.x = goal.target_pose.pose.position.x
@@ -427,9 +426,9 @@ class GraspAction(object):
 		our_goal_base = self.listener.transformPose(_BASE_TF, our_goal)
 
 
-                # when robot approaches table, have arm slightly higher than desired, final height
-                final_arm_height_desired = our_goal_base.pose.position.z
-                # height to lift arm to first`
+		# when robot approaches table, have arm slightly higher than desired, final height
+		final_arm_height_desired = our_goal_base.pose.position.z
+		# height to lift arm to first`
 		arm_obj_lift_val = min(final_arm_height_desired+OBJECT_LIFT_OFFSET , MAX_ARM_LIFT)
 
 		our_goal_base.pose.orientation.x = 0.707
@@ -444,14 +443,14 @@ class GraspAction(object):
 		print "forward motion complete"
 
 		rospy.sleep(2.0)
-                
-                print "open gripper"
-                # open gripper 
-                self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
-                self.gripper_moveit.go()
-                self.gripper_state = True
 
-                rospy.loginfo("open_gripper")
+		print "open gripper"
+		# open gripper
+		self.gripper_moveit.set_joint_value_target("hand_motor_joint", 1.0)
+		self.gripper_moveit.go()
+		self.gripper_state = True
+
+		rospy.loginfo("open_gripper")
 
 		self.backUp()
 
@@ -465,8 +464,6 @@ class GraspAction(object):
 		self.cur_arm_roll=msg.position[2]
 		self.cur_wrist_roll=msg.position[12]
 		self.cur_wrist_flex=msg.position[11]
-	#def cloudCB(self, input) #TODO
-
 
 	def pose_callback(self,msg):
 		self.robot_pos.pose=msg.pose 
